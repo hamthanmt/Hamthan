@@ -1,0 +1,700 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SiteName</title>
+<style>
+  :root{
+    --bg:#0f1416;
+    --bg-alt:#161d20;
+    --card:#1b2327;
+    --teal:#2dd4bf;
+    --teal-dark:#14b8a6;
+    --text:#e6f1ef;
+    --muted:#8aa3a0;
+    --border:#2a3338;
+  }
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    color:var(--text);
+    min-height:100vh;
+    background:
+      linear-gradient(rgba(15,20,22,.75), rgba(15,20,22,.85)),
+      url("bg.jpg") center/cover no-repeat fixed;
+  }
+  /* NAV */
+  nav{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    padding:16px 32px;
+    background:rgba(22,29,32,.85);
+    backdrop-filter:blur(8px);
+    border-bottom:1px solid var(--border);
+    position:sticky;
+    top:0;
+    z-index:100;
+  }
+  .logo{font-size:1.3rem;font-weight:700;color:var(--teal);letter-spacing:1px;}
+  .nav-links{display:flex;gap:8px;list-style:none;}
+  .nav-links li a{
+    color:var(--muted);
+    text-decoration:none;
+    padding:8px 16px;
+    border-radius:8px;
+    font-weight:500;
+    transition:all .2s;
+    cursor:pointer;
+  }
+  .nav-links li a:hover{color:var(--text);background:rgba(45,212,191,.08);}
+  .nav-links li a.active{color:var(--teal);background:rgba(45,212,191,.12);}
+  .account-btn{
+    background:var(--teal);
+    color:#06201d;
+    border:none;
+    padding:10px 22px;
+    border-radius:8px;
+    font-weight:600;
+    cursor:pointer;
+    transition:background .2s;
+  }
+  .account-btn:hover{background:var(--teal-dark);}
+
+  /* PAGES */
+  .page{display:none;padding:48px 32px;max-width:1100px;margin:0 auto;animation:fadeIn .3s ease;}
+  .page.active{display:block;}
+  @keyframes fadeIn{from{opacity:0;transform:translateY(8px);}to{opacity:1;transform:translateY(0);}}
+  h1{font-size:3.5rem;margin-bottom:8px;text-align:center;text-transform:uppercase;letter-spacing:2px;}
+
+  /* HERO BANNER */
+  .hero-banner{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:16px;
+    margin-bottom:32px;
+    border-radius:14px;
+    overflow:hidden;
+  }
+  .hero-banner img{
+    width:100%;
+    height:280px;
+    object-fit:cover;
+    display:block;
+    border-radius:14px;
+    border:1px solid var(--border);
+    transition:transform .4s ease;
+  }
+  .hero-banner img:hover{transform:scale(1.03);}
+  @media(max-width:640px){
+    .hero-banner{grid-template-columns:1fr;}
+    .hero-banner img{height:180px;}
+  }
+  .cursor{display:inline-block;color:var(--teal);animation:blink 1s step-end infinite;}
+  @keyframes blink{50%{opacity:0;}}
+  .subtitle{color:var(--muted);margin-bottom:32px;}
+
+  /* UPLOAD ZONE */
+  .upload-zone{
+    border:2px dashed var(--border);
+    border-radius:14px;
+    padding:48px;
+    text-align:center;
+    background:var(--card);
+    transition:border-color .2s, background .2s;
+    cursor:pointer;
+  }
+  .upload-zone.dragover{border-color:var(--teal);background:rgba(45,212,191,.06);}
+  .upload-zone p{color:var(--muted);margin-top:8px;}
+  .upload-zone strong{color:var(--teal);}
+  .upload-zone input{display:none;}
+
+  .preview-card{
+    margin-top:24px;
+    background:var(--card);
+    border:1px solid var(--border);
+    border-radius:14px;
+    padding:16px;
+    display:none;
+    align-items:center;
+    gap:16px;
+  }
+  .preview-card.active{display:flex;}
+  .preview-card img{
+    width:90px;height:90px;object-fit:cover;border-radius:10px;border:1px solid var(--border);
+  }
+  .preview-info{flex:1;}
+  .preview-info p{font-weight:600;}
+  .preview-info span{color:var(--muted);font-size:.85rem;}
+
+  .btn-primary{
+    background:var(--teal);
+    color:#06201d;
+    border:none;
+    padding:12px 24px;
+    border-radius:8px;
+    font-weight:600;
+    cursor:pointer;
+    transition:background .2s;
+  }
+  .btn-primary:hover{background:var(--teal-dark);}
+  .btn-primary:disabled{opacity:.5;cursor:not-allowed;}
+
+  /* GALLERY */
+  .gallery{
+    display:grid;
+    grid-template-columns:repeat(auto-fill,minmax(180px,1fr));
+    gap:16px;
+    margin-top:24px;
+  }
+  .gallery-item{
+    background:var(--card);
+    border:1px solid var(--border);
+    border-radius:12px;
+    overflow:hidden;
+    position:relative;
+    aspect-ratio:1/1;
+  }
+  .gallery-item img{width:100%;height:100%;object-fit:cover;display:block;}
+  .gallery-item .remove{
+    position:absolute;top:8px;right:8px;
+    background:rgba(15,20,22,.7);
+    color:var(--text);
+    border:none;
+    border-radius:6px;
+    width:28px;height:28px;
+    cursor:pointer;
+    font-size:1rem;
+    line-height:1;
+  }
+  .gallery-item .remove:hover{background:#c0392b;}
+  .empty-state{color:var(--muted);text-align:center;padding:60px 0;}
+
+  /* SCROLL INDICATOR */
+  .scroll-indicator{
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    gap:6px;
+    margin:48px auto 0;
+    color:var(--muted);
+    font-size:.85rem;
+    letter-spacing:1px;
+    text-transform:uppercase;
+    animation:bounce 2s infinite;
+  }
+  .scroll-arrow{font-size:1.5rem;color:var(--teal);line-height:1;}
+  @keyframes bounce{
+    0%,100%{transform:translateY(0);}
+    50%{transform:translateY(8px);}
+  }
+
+  /* ACCOUNT */
+  .form-card{
+    background:var(--card);
+    border:1px solid var(--border);
+    border-radius:14px;
+    padding:32px;
+    max-width:420px;
+    margin:0 auto;
+  }
+  .form-group{margin-bottom:18px;}
+  .form-group label{display:block;margin-bottom:6px;font-size:.9rem;color:var(--muted);}
+  .form-group input{
+    width:100%;
+    padding:12px 14px;
+    background:var(--bg);
+    border:1px solid var(--border);
+    border-radius:8px;
+    color:var(--text);
+    font-size:1rem;
+    outline:none;
+    transition:border-color .2s;
+  }
+  .form-group input:focus{border-color:var(--teal);}
+
+  .auth-tabs{display:flex;gap:8px;margin:0 auto 24px;max-width:420px;}
+  .auth-tab{
+    flex:1;
+    padding:10px;
+    background:var(--card);
+    border:1px solid var(--border);
+    color:var(--muted);
+    border-radius:8px;
+    cursor:pointer;
+    font-weight:600;
+    transition:all .2s;
+  }
+  .auth-tab.active{color:var(--teal);border-color:var(--teal);background:rgba(45,212,191,.08);}
+  .form-error{color:#ff6b6b;font-size:.85rem;margin:-8px 0 14px;min-height:1em;}
+
+  .profile-card{
+    background:var(--card);
+    border:1px solid var(--border);
+    border-radius:14px;
+    padding:32px;
+    max-width:420px;
+    margin:0 auto;
+    display:none;
+  }
+  .profile-card.active{display:block;}
+  .profile-avatar{
+    width:64px;height:64px;border-radius:50%;
+    background:var(--teal);
+    color:#06201d;
+    display:flex;align-items:center;justify-content:center;
+    font-size:1.5rem;font-weight:700;
+    margin-bottom:16px;
+  }
+  .profile-row{
+    display:flex;justify-content:space-between;
+    padding:12px 0;border-bottom:1px solid var(--border);
+  }
+  .profile-row:last-of-type{border-bottom:none;}
+  .profile-row span:first-child{color:var(--muted);}
+  .logout-btn{
+    margin-top:20px;
+    background:transparent;
+    border:1px solid var(--border);
+    color:var(--text);
+    padding:10px 20px;
+    border-radius:8px;
+    cursor:pointer;
+    transition:border-color .2s;
+  }
+  .logout-btn:hover{border-color:var(--teal);}
+
+  .skip-btn{
+    display:block;
+    margin:16px auto 0;
+    max-width:420px;
+    width:100%;
+    background:transparent;
+    color:var(--teal);
+    border:1px solid var(--teal);
+    padding:12px 24px;
+    border-radius:8px;
+    font-weight:600;
+    font-size:1rem;
+    cursor:pointer;
+    transition:background .2s, color .2s;
+  }
+  .skip-btn:hover{background:var(--teal);color:#06201d;}
+
+  @media(max-width:640px){
+    nav{padding:12px 16px;flex-wrap:wrap;gap:12px;}
+    .nav-links{gap:2px;}
+    .nav-links li a{padding:6px 10px;font-size:.9rem;}
+    .page{padding:24px 16px;}
+  }
+</style>
+</head>
+<body>
+
+<nav id="mainNav" style="display:none;">
+  <div class="logo">HAMTHAN</div>
+  <ul class="nav-links">
+    <li><a data-page="home" class="active">Home</a></li>
+    <li><a data-page="about">About</a></li>
+    <li><a data-page="viewers">Viewers</a></li>
+    <li><a data-page="contact">Contact Us</a></li>
+  </ul>
+  <button class="account-btn" data-page="account">Account</button>
+</nav>
+
+<!-- HOME -->
+<section class="page" id="home">
+  <div class="hero-banner">
+    <img src="images/hero1.jpg" alt="Hero banner 1">
+    <img src="images/hero2.jpg" alt="Hero banner 2">
+  </div>
+  <h1><span id="typingText"></span><span class="cursor">|</span></h1>
+
+  <div class="upload-zone" id="dropZone">
+    <p><strong>Click to browse</strong> or drag & drop an image here</p>
+    <p>PNG, JPG, GIF up to ~5MB</p>
+    <input type="file" id="fileInput" accept="image/*">
+  </div>
+
+  <div class="preview-card" id="previewCard">
+    <img id="previewImg" src="" alt="Preview">
+    <div class="preview-info">
+      <p id="previewName"></p>
+      <span id="previewSize"></span>
+    </div>
+    <button class="btn-primary" id="saveBtn">Save to Viewers Page</button>
+  </div>
+
+  <div class="scroll-indicator">
+    <span>Scroll Down</span>
+    <div class="scroll-arrow">⌄</div>
+  </div>
+</section>
+
+<!-- ABOUT -->
+<section class="page" id="about">
+  <h1>About</h1>
+  <p class="subtitle">A simple single-page demo template with a dark teal theme.</p>
+  <p>This site demonstrates client-side navigation, file preview, localStorage-backed image galleries, and a basic account/session flow — all in one HTML file.</p>
+</section>
+
+<!-- VIEWERS -->
+<section class="page" id="viewers">
+  <h1>Viewers Gallery</h1>
+  <div class="gallery" id="gallery"></div>
+</section>
+
+<!-- CONTACT -->
+<section class="page" id="contact">
+  <h1>Contact Us</h1>
+  <p class="subtitle">Reach out anytime.</p>
+  <p>Email: hello@example.com<br>Phone: (555) 123-4567</p>
+</section>
+
+<!-- ACCOUNT -->
+<section class="page active" id="account">
+  <h1>Account</h1>
+  <p class="subtitle" id="accountSubtitle" style="text-align:center;color:var(--teal);">Sign in or create a new account.</p>
+
+  <div class="auth-tabs" id="authTabs">
+    <button class="auth-tab active" data-tab="signin">Sign In</button>
+    <button class="auth-tab" data-tab="signup">Sign Up</button>
+  </div>
+
+  <!-- SIGN IN -->
+  <form class="form-card" id="signinForm">
+    <div class="form-group">
+      <label for="signinEmail">Email</label>
+      <input type="email" id="signinEmail" required>
+    </div>
+    <div class="form-group">
+      <label for="signinPassword">Password</label>
+      <input type="password" id="signinPassword" required>
+    </div>
+    <p class="form-error" id="signinError"></p>
+    <button type="submit" class="btn-primary">Sign In</button>
+  </form>
+
+  <!-- SIGN UP -->
+  <form class="form-card" id="registerForm" style="display:none;">
+    <div class="form-group">
+      <label for="username">Username</label>
+      <input type="text" id="username" required>
+    </div>
+    <div class="form-group">
+      <label for="email">Email</label>
+      <input type="email" id="email" required>
+    </div>
+    <div class="form-group">
+      <label for="password">Password</label>
+      <input type="password" id="password" required>
+    </div>
+    <p class="form-error" id="signupError"></p>
+    <button type="submit" class="btn-primary">Sign Up</button>
+  </form>
+
+
+  <div class="profile-card" id="profileCard">
+    <div class="profile-avatar" id="profileAvatar"></div>
+    <div class="profile-row"><span>Username</span><span id="profileUsername"></span></div>
+    <div class="profile-row"><span>Email</span><span id="profileEmail"></span></div>
+    <div class="profile-row"><span>Password</span><span id="profilePassword"></span></div>
+    <button class="logout-btn" id="logoutBtn">Log Out</button>
+  </div>
+
+  <button class="skip-btn" id="skipBtn">Skip</button>
+</section>
+
+<script>
+// ---------- NAVIGATION ----------
+const navLinks = document.querySelectorAll('[data-page]');
+const pages = document.querySelectorAll('.page');
+
+function showPage(id){
+  pages.forEach(p => p.classList.toggle('active', p.id === id));
+  navLinks.forEach(l => l.classList.toggle('active', l.dataset.page === id));
+  if(id === 'viewers') renderGallery();
+}
+
+navLinks.forEach(link => {
+  link.addEventListener('click', () => showPage(link.dataset.page));
+});
+
+// ---------- HOME: FILE UPLOAD & PREVIEW ----------
+const dropZone = document.getElementById('dropZone');
+const fileInput = document.getElementById('fileInput');
+const previewCard = document.getElementById('previewCard');
+const previewImg = document.getElementById('previewImg');
+const previewName = document.getElementById('previewName');
+const previewSize = document.getElementById('previewSize');
+const saveBtn = document.getElementById('saveBtn');
+
+let currentImageData = null;
+
+dropZone.addEventListener('click', () => fileInput.click());
+
+dropZone.addEventListener('dragover', e => {
+  e.preventDefault();
+  dropZone.classList.add('dragover');
+});
+dropZone.addEventListener('dragleave', () => dropZone.classList.remove('dragover'));
+dropZone.addEventListener('drop', e => {
+  e.preventDefault();
+  dropZone.classList.remove('dragover');
+  if(e.dataTransfer.files.length) handleFile(e.dataTransfer.files[0]);
+});
+
+fileInput.addEventListener('change', () => {
+  if(fileInput.files.length) handleFile(fileInput.files[0]);
+});
+
+function handleFile(file){
+  if(!file.type.startsWith('image/')) return;
+  const reader = new FileReader();
+  reader.onload = e => {
+    addWatermark(e.target.result, watermarked => {
+      currentImageData = watermarked;
+      previewImg.src = currentImageData;
+      previewName.textContent = file.name;
+      previewSize.textContent = (file.size / 1024).toFixed(1) + ' KB';
+      previewCard.classList.add('active');
+    });
+  };
+  reader.readAsDataURL(file);
+}
+
+function addWatermark(dataUrl, callback){
+  const img = new Image();
+  img.onload = () => {
+    // Resize large images down to keep localStorage usage manageable
+    const MAX_DIM = 1280;
+    let { width, height } = img;
+    if(width > MAX_DIM || height > MAX_DIM){
+      const scale = MAX_DIM / Math.max(width, height);
+      width = Math.round(width * scale);
+      height = Math.round(height * scale);
+    }
+
+    const canvas = document.createElement('canvas');
+    canvas.width = width;
+    canvas.height = height;
+    const ctx = canvas.getContext('2d');
+    ctx.drawImage(img, 0, 0, width, height);
+
+    const fontSize = Math.max(20, Math.floor(canvas.width * 0.04));
+    ctx.font = `bold ${fontSize}px sans-serif`;
+    ctx.textBaseline = 'bottom';
+    ctx.textAlign = 'right';
+
+    const text = 'HAMTHAN';
+    const padding = fontSize * 0.6;
+    const x = canvas.width - padding;
+    const y = canvas.height - padding;
+
+    ctx.lineWidth = fontSize * 0.08;
+    ctx.strokeStyle = 'rgba(0,0,0,0.6)';
+    ctx.strokeText(text, x, y);
+
+    ctx.fillStyle = 'rgba(45,212,191,0.9)';
+    ctx.fillText(text, x, y);
+
+    callback(canvas.toDataURL('image/jpeg', 0.8));
+  };
+  img.src = dataUrl;
+}
+
+saveBtn.addEventListener('click', () => {
+  if(!currentImageData) return;
+  const images = JSON.parse(localStorage.getItem('galleryImages') || '[]');
+  images.push(currentImageData);
+
+  try{
+    localStorage.setItem('galleryImages', JSON.stringify(images));
+  } catch(err){
+    if(err.name === 'QuotaExceededError'){
+      alert('Storage is full. Please remove some images from the Viewers page before adding more.');
+    } else {
+      alert('Could not save image: ' + err.message);
+    }
+    return;
+  }
+
+  // reset
+  previewCard.classList.remove('active');
+  fileInput.value = '';
+  currentImageData = null;
+
+  showPage('viewers');
+});
+
+// ---------- VIEWERS: GALLERY ----------
+const gallery = document.getElementById('gallery');
+
+function renderGallery(){
+  const images = JSON.parse(localStorage.getItem('galleryImages') || '[]');
+  gallery.innerHTML = '';
+
+  if(images.length === 0){
+    gallery.innerHTML = '<p class="empty-state">No images yet. Upload one from the Home page.</p>';
+    return;
+  }
+
+  images.forEach((src, idx) => {
+    const item = document.createElement('div');
+    item.className = 'gallery-item';
+    item.innerHTML = `<img src="${src}" alt="Uploaded image ${idx+1}">`;
+    gallery.appendChild(item);
+  });
+}
+
+// ---------- ACCOUNT ----------
+const authTabs = document.getElementById('authTabs');
+const mainNav = document.getElementById('mainNav');
+const signinForm = document.getElementById('signinForm');
+const registerForm = document.getElementById('registerForm');
+const accountSubtitle = document.getElementById('accountSubtitle');
+const profileCard = document.getElementById('profileCard');
+const profileAvatar = document.getElementById('profileAvatar');
+const profileUsername = document.getElementById('profileUsername');
+const profileEmail = document.getElementById('profileEmail');
+const profilePassword = document.getElementById('profilePassword');
+const logoutBtn = document.getElementById('logoutBtn');
+const skipBtn = document.getElementById('skipBtn');
+const signinError = document.getElementById('signinError');
+const signupError = document.getElementById('signupError');
+
+// tab switching
+authTabs.addEventListener('click', e => {
+  const btn = e.target.closest('.auth-tab');
+  if(!btn) return;
+  authTabs.querySelectorAll('.auth-tab').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  if(btn.dataset.tab === 'signin'){
+    signinForm.style.display = 'block';
+    registerForm.style.display = 'none';
+  } else {
+    signinForm.style.display = 'none';
+    registerForm.style.display = 'block';
+  }
+  signinError.textContent = '';
+  signupError.textContent = '';
+});
+
+function showProfile(data){
+  authTabs.style.display = 'none';
+  signinForm.style.display = 'none';
+  registerForm.style.display = 'none';
+  accountSubtitle.style.display = 'none';
+  profileCard.classList.add('active');
+  profileAvatar.textContent = data.username.charAt(0).toUpperCase();
+  profileUsername.textContent = data.username;
+  profileEmail.textContent = data.email;
+  profilePassword.textContent = '•'.repeat(data.password.length);
+
+  mainNav.style.display = 'flex';
+}
+
+function showAuthForms(){
+  authTabs.style.display = 'flex';
+  accountSubtitle.style.display = 'block';
+  profileCard.classList.remove('active');
+  authTabs.querySelector('[data-tab="signin"]').click();
+
+  mainNav.style.display = 'none';
+  showPage('account');
+}
+
+// SIGN UP
+registerForm.addEventListener('submit', e => {
+  e.preventDefault();
+  const username = document.getElementById('username').value.trim();
+  const email = document.getElementById('email').value.trim();
+  const password = document.getElementById('password').value;
+
+  const users = JSON.parse(localStorage.getItem('users') || '[]');
+  if(users.some(u => u.email === email)){
+    signupError.textContent = 'An account with this email already exists.';
+    return;
+  }
+  signupError.textContent = '';
+  const newUser = { username, email, password };
+  users.push(newUser);
+  localStorage.setItem('users', JSON.stringify(users));
+  sessionStorage.setItem('userProfile', JSON.stringify(newUser));
+  registerForm.reset();
+  showProfile(newUser);
+  showPage('home');
+});
+
+// SIGN IN
+signinForm.addEventListener('submit', e => {
+  e.preventDefault();
+  const email = document.getElementById('signinEmail').value.trim();
+  const password = document.getElementById('signinPassword').value;
+
+  const users = JSON.parse(localStorage.getItem('users') || '[]');
+  const user = users.find(u => u.email === email && u.password === password);
+
+  if(!user){
+    signinError.textContent = 'Invalid email or password.';
+    return;
+  }
+  signinError.textContent = '';
+  sessionStorage.setItem('userProfile', JSON.stringify(user));
+  signinForm.reset();
+  showProfile(user);
+  showPage('home');
+});
+
+logoutBtn.addEventListener('click', () => {
+  sessionStorage.removeItem('userProfile');
+  showAuthForms();
+});
+
+skipBtn.addEventListener('click', () => {
+  mainNav.style.display = 'flex';
+  showPage('home');
+});
+
+// ---------- TYPING EFFECT ----------
+function typeEffect(el, text, speed = 80, pause = 1500){
+  let i = 0;
+  let deleting = false;
+  el.textContent = '';
+  function type(){
+    if(!deleting){
+      el.textContent = text.substring(0, i+1);
+      i++;
+      if(i === text.length){
+        setTimeout(() => { deleting = true; type(); }, pause);
+        return;
+      }
+    } else {
+      el.textContent = text.substring(0, i-1);
+      i--;
+      if(i === 0){
+        deleting = false;
+      }
+    }
+    setTimeout(type, deleting ? speed/2 : speed);
+  }
+  type();
+}
+
+// ---------- INIT ----------
+window.addEventListener('DOMContentLoaded', () => {
+  typeEffect(document.getElementById('typingText'), 'Upload an Image', 150, 2500);
+  renderGallery();
+  const saved = sessionStorage.getItem('userProfile');
+  if(saved){
+    showProfile(JSON.parse(saved));
+    showPage('home');
+  } else {
+    showAuthForms();
+  }
+});
+</script>
+
+</body>
+</html>
